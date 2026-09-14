@@ -7,16 +7,15 @@
       <div class="col-md-6 mx-auto mb-3">
         <h2>{{ template_data.movie.name }}</h2>
         <hr />
-        <p><b>Description:</b> {{template_data.movie.description }}</p>
-        <p><b>Price:</b> ${{template_data.movie.price }}</p>
-        <p class="card-text">
+        <p><b>Description:</b> {{ template_data.movie.description }}</p>
+        <p><b>Price:</b> ${{ template_data.movie.price }}</p>
+        <div class="card-text mb-3">
           <form method="post" action="{% url 'cart.add' id=template_data.movie.id %}">
             <div class="row">
               {% csrf_token %}
               <div class="col-auto">
                 <div class="input-group col-auto">
-                  <div class="input-group-text">Quantity
-                    </div>
+                  <div class="input-group-text">Quantity</div>
                   <input type="number" min="1" max="10" class="form-control quantity-input" name="quantity" value="1">
                 </div>
               </div>
@@ -25,7 +24,7 @@
               </div>
             </div>
           </form>
-        </p>
+        </div>
 
         <h2>Reviews</h2>
         <hr />
@@ -40,31 +39,30 @@
             </h6>
             <p class="card-text">{{ review.comment }}</p>
             {% if user.is_authenticated and user == review.user %}
-            <a class="btn btn-primary" href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">Edit</a>
-            <a class="btn btn-danger" href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">Delete</a>
+              <a class="btn btn-primary" href="{% url 'movies.edit_review' id=template_data.movie.id review_id=review.id %}">Edit</a>
+              <a class="btn btn-danger" href="{% url 'movies.delete_review' id=template_data.movie.id review_id=review.id %}">Delete</a>
+            {% elif user.is_authenticated %}
+              <a class="btn btn-outline-warning btn-sm" href="{% url 'movies.report_review' id=template_data.movie.id review_id=review.id %}" onclick="return confirm('Are you sure you want to report this review?');">Report</a>
             {% endif %}
           </li>
           {% endfor %}
         </ul>
+
         {% if user.is_authenticated %}
         <div class="container mt-4">
           <div class="row justify-content-center">
             <div class="col-12">
               <div class="card shadow p-3 mb-4 rounded">
                 <div class="card-body">
-                  <b class="text-start">Create a review
-                    </b><br /><br />
+                  <b class="text-start">Create a review</b><br /><br />
                   <form method="POST" action="{% url 'movies.create_review' id=template_data.movie.id %}">
                     {% csrf_token %}
                     <p>
                       <label for="comment">Comment:</label>
-                      <textarea name="comment" required
-                      class="form-control"
-                      id="comment"></textarea>
+                      <textarea name="comment" required class="form-control" id="comment"></textarea>
                     </p>
                     <div class="text-center">
-                      <button type="submit"
-                        class="btn bg-dark text-white">
+                      <button type="submit" class="btn bg-dark text-white">
                         Add Review
                       </button>
                     </div>
