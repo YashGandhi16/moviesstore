@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Review
+from .models import Movie, Review, Rating
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
 
 
 @login_required
@@ -40,10 +41,20 @@ def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie, is_reported = False)
 
+    avg_score = Rating.objects.filter(movie=movie).aggregate(Avg('score'))['score__avg']
+    average_rating = round(avg_score, 1) if avg_score else None
+
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = Rating.objects.filter(movie=movie, user=request.user).first()
+
     template_data = {}
     template_data['title'] = movie.name
     template_data['movie'] = movie
     template_data['reviews'] = reviews
+    template_data['average_rating'] = average_rating
+    template_data['user_rating'] = user_rating
+
 
     return render(request, 'movies/show.html', {'template_data': template_data})
 
@@ -77,4 +88,18 @@ def delete_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+
+@login_required
+def rate_movie(request, id):
+    if request.method == 'POST':
+        movie = get_object_or_404(Movie, id=id)
+        score = request.POST.get('score')
+        if score and score.isdigit() and 1 <= int(score) <= 5:
+            Rating.objects.update_or_create(
+                movie=movie,
+                user=request.user,
+                defaults={'score': int(score)}
+            )
+        return redirect('movies.show', id=id)
 

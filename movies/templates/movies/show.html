@@ -9,6 +9,43 @@
         <hr />
         <p><b>Description:</b> {{ template_data.movie.description }}</p>
         <p><b>Price:</b> ${{ template_data.movie.price }}</p>
+        <p>
+          <b>Average Rating:</b>
+          {% if template_data.average_rating %}
+            ★ {{ template_data.average_rating }} / 5.0
+          {% else %}
+            <span class="text-muted">No ratings yet</span>
+          {% endif %}
+        </p>
+
+        {% if user.is_authenticated %}
+        <div class="card p-3 mb-3 bg-light">
+          <form method="POST" action="{% url 'movies.rate_movie' id=template_data.movie.id %}">
+            {% csrf_token %}
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <label for="score" class="form-label mb-0"><b>Your Rating:</b></label>
+              </div>
+              <div class="col-auto">
+                <select name="score" id="score" class="form-select form-select-sm" required>
+                  <option value="" disabled {% if not template_data.user_rating %}selected{% endif %}>Select Stars</option>
+                  <option value="5" {% if template_data.user_rating and template_data.user_rating.score == 5 %}selected{% endif %}>★★★★★ (5 Stars)</option>
+                  <option value="4" {% if template_data.user_rating and template_data.user_rating.score == 4 %}selected{% endif %}>★★★★☆ (4 Stars)</option>
+                  <option value="3" {% if template_data.user_rating and template_data.user_rating.score == 3 %}selected{% endif %}>★★★☆☆ (3 Stars)</option>
+                  <option value="2" {% if template_data.user_rating and template_data.user_rating.score == 2 %}selected{% endif %}>★★☆☆☆ (2 Stars)</option>
+                  <option value="1" {% if template_data.user_rating and template_data.user_rating.score == 1 %}selected{% endif %}>★☆☆☆☆ (1 Star)</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-warning btn-sm">Submit Rating</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        {% else %}
+        <p class="text-muted small"><a href="{% url 'accounts.login' %}">Log in</a> to leave a rating.</p>
+        {% endif %}
+
         <div class="card-text mb-3">
           <form method="post" action="{% url 'cart.add' id=template_data.movie.id %}">
             <div class="row">
