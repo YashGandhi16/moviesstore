@@ -1,0 +1,9 @@
+{% extends 'admin/index.html' %}
+{% block content %}
+<p>
+  <a class="button" href="{% url 'admin_user_engagement' %}">
+    User Engagement
+  </a>
+</p>
+{{ block.super }}
+{% endblock content %}

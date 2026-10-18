@@ -1,0 +1,27 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<div class="container py-4">
+    <h2>User Engagement</h2>
+    <p>Users with the most engagement on the movie store, meaning who has purchased the most movies</p>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">Movies purchased</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for buyers in template_data.tops %}
+            <tr>
+                <td>{{ buyers.username }}</td>
+                <td>{{ buyers.movies_purchased }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No movies have been purchased yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

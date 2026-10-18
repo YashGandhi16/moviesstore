@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-
+from cart import views as cart_views
 
 urlpatterns = [
+    path('admin/user-engagement/', admin.site.admin_view(cart_views.user_engagement),name='admin_user_engagement'),
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('movies/', include('movies.urls')),

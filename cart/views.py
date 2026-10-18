@@ -3,7 +3,10 @@ from django.shortcuts import get_object_or_404, redirect
 from movies.models import Movie
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import get_user_model
+from django.db.models import Sum
+from django.contrib import admin
 
 from .utils import calculate_cart_total
 def index(request):
@@ -58,3 +61,26 @@ def purchase(request):
     return render(request, 'cart/purchase.html',
         {'template_data': template_data})
 
+@staff_member_required
+def user_engagement(request):
+    buyers = (get_user_model().objects
+              .annotate(movies_purchased=Sum("order__item__quantity"))
+              .filter(movies_purchased__gt=0))
+    top = buyers.order_by("-movies_purchased", "pk").first()
+    tops = (buyers.filter(
+        movies_purchased=top.movies_purchased).order_by("username", "pk")
+        if top is not None else []
+    )
+    template_data = {
+        "title": "User Engagement",
+        "tops": tops,
+    }
+    return render(
+        request,
+        "cart/user_engagement.html",
+        {
+            **admin.site.each_context(request),
+            "title": "User Engagement",
+            "template_data": template_data,
+        },
+    )
