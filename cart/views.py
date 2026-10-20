@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
-from movies.models import Movie
+from movies.models import Movie, Review
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.contrib import admin
 
 from .utils import calculate_cart_total
@@ -84,3 +84,42 @@ def user_engagement(request):
             "template_data": template_data,
         },
     )
+
+@staff_member_required
+def movie_statistics(request):
+
+    purchases = (Item.objects
+                 .values('movie_id', 'movie__name')
+                 .annotate(total=Sum('quantity'))
+                 .order_by('-total', 'movie__name', 'movie_id'))
+    
+    reviews = (Review.objects
+                 .values('movie_id', 'movie__name')
+                 .annotate(total=Sum('id'))
+                 .order_by('-total', 'movie__name', 'movie_id'))
+    
+    most_purchased_count = (purchases[0]['total'] if purchases else 0)
+    most_reviewed_count = (reviews[0]['total'] if reviews else 0)
+
+    template_data = {
+        'title': 'Movie Statistics',
+        'most_purchased': [
+            movie for movie in purchases
+            if movie['total'] == most_purchased_count
+        ],
+        'most_reviewed': [
+            movie for movie in reviews
+            if movie['total'] == most_reviewed_count
+        ],
+    }
+
+    return render(
+        request,
+        'cart/movie_statistics.html',
+        {
+            **admin.site.each_context(request),
+            'title': 'Movie Statistics',
+            'template_data': template_data,
+        },
+    )
+
