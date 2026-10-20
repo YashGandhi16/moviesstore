@@ -116,5 +116,5 @@ def top_commenter(request):
     template_data = {}
     template_data['title'] = 'Top Commenter'
     template_data['top_user'] = top_user
-    return render(request, 'moves/top_commenter.html',
+    return render(request, 'movies/top_commenter.html',
     {'template_data': template_data})
