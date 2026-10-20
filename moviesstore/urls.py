@@ -22,7 +22,7 @@ from cart import views as cart_views
 
 urlpatterns = [
     path('admin/user-engagement/', admin.site.admin_view(cart_views.user_engagement),name='admin_user_engagement'),
-    path('admin/movie-statistics/', admin.site.admin_view(cart_views.movie_statistics)),
+    path('admin/movie-statistics/', admin.site.admin_view(cart_views.movie_statistics), name='admin_movie_statistics'),
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('movies/', include('movies.urls')),
