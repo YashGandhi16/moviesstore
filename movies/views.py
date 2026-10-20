@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review, Rating
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.contrib.auth.models import User
+from django.db.models import Avg, Count
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 @login_required
@@ -103,3 +105,16 @@ def rate_movie(request, id):
             )
         return redirect('movies.show', id=id)
 
+@staff_member_required
+def top_commenter(request):
+    top_user = (User.objects
+        .annotate(comment_count=Count('review'))
+        .filter(comment_count__gt=0)
+        .order_by('-comment_count', 'username')
+        .first())
+
+    template_data = {}
+    template_data['title'] = 'Top Commenter'
+    template_data['top_user'] = top_user
+    return render(request, 'movies/top_commenter.html',
+    {'template_data': template_data})
