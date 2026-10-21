@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="context-main">
+    <p>
+        Users ranked by total movie units purchased.
+        Leave the list size empty to see every user.
+    </p>
+    <form method="get"
+          action ="{% url 'admin_top_purchasers' %}"
+          style="margin-bottom: 20px;">
+      <label for="id_size">List size:</label>
+      <input type="number"
+             name="size"
+             id="id_size"
+             min="1"
+             step ="1"
+             value="{{ size_value }}"
+             placeholders="All users">
+      <input type="submit" value="Apply">
+      {% if list_size or error %}
+      <a href="{% url 'admin_top_purchasers' %}">
+        Show all users
+      </a>"
+      {% endif %}
+      </form>
+    {% if error %}
+    <p class="errornote">
+        {{ error }} Showing all users instead.
+    </p>
+    {% endif %}
+    <p id="top-purchasers-summary">
+        {% if list_size %}
+        Showing the top {{ purchasers|length }} of {{ total_users }} users.
+        {% else %}
+        Showing all {{ total_users }} users.
+        {% endif %}
+    </p>
+    <div class="module">
+        <table id="top-purchasers" style="width: 100%;">
+          <thead>
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Movies purchased</th>
+                <th scope="col">Orders placed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for purchaser in purchasers %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <th scope="row">{{ purchaser.username }}</th>
+                <td>{{ purchaser.movies_purchased }}</td>
+                <td>{{ purchaser.orders_placed }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">There are no users yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
