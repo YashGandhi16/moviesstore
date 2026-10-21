@@ -8,5 +8,17 @@
     Movie Statistics
   </a>
 </p>
+<div class="module">
+  <table>
+    <caption>Reports</caption>
+    <tr>
+      <th scope=""row>
+        <a href="{% url 'admin_top_purchasers' %}">
+        Top purchasers
+        </a>
+      </th>
+    </tr>
+  </table>
+</div>
 {{ block.super }}
 {% endblock content %}
